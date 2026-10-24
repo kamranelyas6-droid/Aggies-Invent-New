@@ -1,9 +1,19 @@
 """AMSI demo: adaptive multi scale inspection. Run:  streamlit run app.py"""
-import hashlib, io, json
+import hashlib, io, json, os, sys, types
 import numpy as np
 import pandas as pd
 import streamlit as st
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+if not os.path.isdir(os.path.join(HERE, "amsi")):
+    # files were uploaded without their folders: treat this folder as the amsi package
+    _pkg = types.ModuleType("amsi"); _pkg.__path__ = [HERE]; sys.modules["amsi"] = _pkg
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
 from amsi import pipeline as PL, figures as FG, part as P, calibration as CALIB
+
+RIG_IMG = next((p for p in (os.path.join(HERE, "assets", "rig_v4_labeled.png"), os.path.join(HERE, "rig_v4_labeled.png"))
+                if os.path.exists(p)), None)
 
 st.set_page_config(page_title="AMSI · Adaptive Multi Scale Inspection", page_icon="🔬", layout="wide")
 st.markdown("""
@@ -100,7 +110,7 @@ if "res" not in st.session_state:
         c.markdown(f"<div class='step'><h4>{h}</h4>{t}</div>", unsafe_allow_html=True)
     st.write("")
     a, b = st.columns([3, 2])
-    a.image("assets/rig_v4_labeled.png", caption="The inspection rig: camera and confocal pen on one carriage, end clamps and a clamping table")
+    a.image(RIG_IMG, caption="The inspection rig: camera and confocal pen on one carriage, end clamps and a clamping table")
     b.info("Choose a part on the left and press Run inspection. Start with the defective part to see every kind of "
            "decision, then try the near limit part to see the automatic switch from camera to confocal.")
     st.stop()
@@ -322,4 +332,4 @@ digraph G { rankdir=LR; node [shape=box, style="rounded,filled", fillcolor="#f3f
 5. Verdict. Every requirement ends Conforming or Nonconforming only when its whole uncertainty interval is on one side of
    the limit; otherwise it is flagged for review. Every step is recorded in a hash linked evidence trail.
 """)
-    st.image("assets/rig_v4_labeled.png", caption="Rig: gantry with camera and confocal pen, end clamps, clamping lift and turn table")
+    st.image(RIG_IMG, caption="Rig: gantry with camera and confocal pen, end clamps, clamping lift and turn table")

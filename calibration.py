@@ -19,7 +19,8 @@ from datetime import date
 import numpy as np
 from . import camera as CAM, confocal as CF, part as P
 
-DATA = os.path.join(os.path.dirname(__file__), "data")
+_HERE = os.path.dirname(os.path.abspath(__file__))
+DATA = os.path.join(_HERE, "data") if os.path.isdir(os.path.join(_HERE, "data")) else _HERE   # also works if folders were flattened
 CAL_JSON = os.path.join(DATA, "calibration.json")
 BANK_NPZ = os.path.join(DATA, "mark_bank.npz")
 
